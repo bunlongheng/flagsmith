@@ -20,6 +20,7 @@ import {
   ONBOARDING_FLAG_NAME,
   ONBOARDING_TAG,
   findOnboardingFlag,
+  findOnboardingTag,
   shouldSeedOnboardingFlag,
 } from './onboardingFlag'
 import { SmartDefaults } from 'components/pages/onboarding/hooks/useSmartDefaults'
@@ -134,14 +135,14 @@ async function ensureEnvironments(
     .unwrap()
 }
 
-async function findOnboardingTag(
+async function fetchOnboardingTag(
   store: Store,
   projectId: number,
 ): Promise<Tag | undefined> {
   const tags = await store
     .dispatch(tagService.endpoints.getTags.initiate({ projectId }))
     .unwrap()
-  return tags?.find((t) => t.label === ONBOARDING_TAG.label)
+  return findOnboardingTag(tags ?? [])
 }
 
 async function ensureFlag(
@@ -156,7 +157,7 @@ async function ensureFlag(
     )
     .unwrap()
   const results = flags?.results ?? []
-  const onboardingTag = await findOnboardingTag(store, project.id)
+  const onboardingTag = await fetchOnboardingTag(store, project.id)
   const existing = findOnboardingFlag(results, onboardingTag)
   if (existing) {
     return existing
@@ -187,7 +188,7 @@ async function ensureOnboardingTag(
 ): Promise<void> {
   try {
     const tag =
-      (await findOnboardingTag(store, project.id)) ??
+      (await fetchOnboardingTag(store, project.id)) ??
       (await store
         .dispatch(
           tagService.endpoints.createTag.initiate({

@@ -1,14 +1,33 @@
 import { ProjectFlag, Tag } from 'common/types/responses'
 import {
   ONBOARDING_FLAG_NAME,
+  ONBOARDING_TAG,
   findOnboardingFlag,
+  findOnboardingTag,
   shouldSeedOnboardingFlag,
 } from 'components/pages/onboarding/bootstrap/onboardingFlag'
 
 const flag = (name: string, tags: number[] = []): ProjectFlag =>
   ({ id: name.length, name, tags } as ProjectFlag)
 
-const onboardingTag = { id: 7, label: 'Onboarding' } as Tag
+const onboardingTag = { id: 7, ...ONBOARDING_TAG } as Tag
+
+describe('findOnboardingTag', () => {
+  it('finds the tag a previous run created', () => {
+    expect(
+      findOnboardingTag([{ id: 3, label: 'Backend' } as Tag, onboardingTag]),
+    ).toBe(onboardingTag)
+  })
+
+  it('ignores a tag the customer labelled Onboarding themselves', () => {
+    const theirs = {
+      description: 'Flags behind our signup flow',
+      id: 9,
+      label: 'Onboarding',
+    } as Tag
+    expect(findOnboardingTag([theirs])).toBeUndefined()
+  })
+})
 
 describe('shouldSeedOnboardingFlag', () => {
   it('seeds into an empty project', () => {

@@ -8,6 +8,15 @@ export const ONBOARDING_TAG = {
   label: 'Onboarding',
 }
 
+// Our own tag, not any tag a customer happens to label "Onboarding": the flag
+// we find here is toured, toggled and renamed, so it must be one we created.
+export const findOnboardingTag = (tags: Tag[]): Tag | undefined =>
+  tags.find(
+    (t) =>
+      t.label === ONBOARDING_TAG.label &&
+      t.description === ONBOARDING_TAG.description,
+  )
+
 // A previous run's flag. Tag first: renaming is a delete and recreate, so the
 // name alone is not reliable.
 export const findOnboardingFlag = (
